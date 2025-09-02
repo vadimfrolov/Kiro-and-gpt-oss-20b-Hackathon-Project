@@ -27,6 +27,17 @@ class TaskStatus(str, Enum):
     COMPLETED = "COMPLETED"
 
 
+class TaskCategory(str, Enum):
+    """Task category options."""
+    WORK = "WORK"
+    PERSONAL = "PERSONAL"
+    HEALTH = "HEALTH"
+    FINANCE = "FINANCE"
+    LEARNING = "LEARNING"
+    SHOPPING = "SHOPPING"
+    OTHER = "OTHER"
+
+
 class MessageRole(str, Enum):
     """Chat message roles."""
     USER = "USER"

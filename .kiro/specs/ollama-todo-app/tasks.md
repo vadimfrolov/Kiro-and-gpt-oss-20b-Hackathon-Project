@@ -31,8 +31,8 @@
   - Implement database ORM models using SQLAlchemy
   - _Requirements: 1.1, 5.1, 7.1, 7.4_
 
-- [ ] 4. Set up Ollama service integration
-- [ ] 4.1 Implement Ollama connection and client setup
+- [x] 4. Set up Ollama service integration
+- [x] 4.1 Implement Ollama connection and client setup
 
   - Create OllamaService class with connection management to localhost:11434
   - Implement connection health checking and retry logic
@@ -40,7 +40,7 @@
   - Write unit tests for Ollama service with mocking
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 4.2 Implement AI prompt engineering and task generation
+- [x] 4.2 Implement AI prompt engineering and task generation
 
   - Create structured prompts for task generation from natural language
   - Implement task categorization and priority suggestion functions

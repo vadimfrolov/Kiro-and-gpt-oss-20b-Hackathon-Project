@@ -4,7 +4,7 @@ Task-related Pydantic schemas for API validation.
 from datetime import datetime
 from typing import Optional, Dict, List
 from pydantic import BaseModel, Field, field_validator
-from app.models.database import Priority, TaskStatus
+from app.models.database import Priority, TaskStatus, TaskCategory
 
 
 class TaskBase(BaseModel):
