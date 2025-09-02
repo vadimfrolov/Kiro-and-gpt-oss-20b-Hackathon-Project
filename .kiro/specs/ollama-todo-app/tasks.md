@@ -48,8 +48,8 @@
   - Write tests for prompt processing and response parsing
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 5.1, 5.2_
 
-- [ ] 5. Create FastAPI backend with core endpoints
-- [ ] 5.1 Implement task CRUD API endpoints
+- [x] 5. Create FastAPI backend with core endpoints
+- [x] 5.1 Implement task CRUD API endpoints
 
   - Create POST /tasks endpoint for task creation with database storage
   - Implement GET /tasks endpoint with filtering and pagination
@@ -57,7 +57,7 @@
   - Include PATCH /tasks/{id}/complete for status updates
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 5.2 Implement chat and AI integration endpoints
+- [x] 5.2 Implement chat and AI integration endpoints
 
   - Create POST /chat/generate-tasks endpoint for prompt processing
   - Add GET /chat/messages endpoint for conversation history
@@ -65,15 +65,15 @@
   - Create POST /tasks/{id}/improve endpoint for task enhancement
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 6. Implement Google Calendar integration (optional feature)
-- [ ] 6.1 Set up Google Calendar API authentication
+- [x] 6. Implement Google Calendar integration (optional feature)
+- [x] 6.1 Set up Google Calendar API authentication
 
   - Implement OAuth2 flow for Google Calendar access
   - Create credential storage and refresh token management
   - Add calendar service initialization and connection testing
   - _Requirements: 6.1_
 
-- [ ] 6.2 Implement calendar sync functionality
+- [x] 6.2 Implement calendar sync functionality
 
   - Create calendar event creation from tasks with due dates
   - Implement bidirectional sync for task updates and calendar events
