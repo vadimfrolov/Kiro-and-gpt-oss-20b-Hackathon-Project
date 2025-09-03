@@ -46,6 +46,7 @@ Replace `your_client_id_here` and `your_client_secret_here` with the values from
 ### Authentication Endpoints
 
 #### Get Authorization URL
+
 ```http
 GET /calendar/auth-url?user_id=USER_ID
 ```
@@ -53,6 +54,7 @@ GET /calendar/auth-url?user_id=USER_ID
 Returns an authorization URL that users need to visit to grant calendar access.
 
 **Response:**
+
 ```json
 {
   "auth_url": "https://accounts.google.com/oauth/authorize?...",
@@ -61,6 +63,7 @@ Returns an authorization URL that users need to visit to grant calendar access.
 ```
 
 #### Handle OAuth Callback
+
 ```http
 POST /calendar/auth-callback
 Content-Type: application/json
@@ -74,6 +77,7 @@ Content-Type: application/json
 Handles the OAuth callback from Google after user authorization.
 
 **Response:**
+
 ```json
 {
   "authenticated": true,
@@ -82,6 +86,7 @@ Handles the OAuth callback from Google after user authorization.
 ```
 
 #### Check Authentication Status
+
 ```http
 GET /calendar/auth-status?user_id=USER_ID
 ```
@@ -89,6 +94,7 @@ GET /calendar/auth-status?user_id=USER_ID
 Checks if a user is authenticated with Google Calendar.
 
 **Response:**
+
 ```json
 {
   "authenticated": true,
@@ -97,6 +103,7 @@ Checks if a user is authenticated with Google Calendar.
 ```
 
 #### Test Connection
+
 ```http
 POST /calendar/test-connection?user_id=USER_ID
 ```
@@ -104,6 +111,7 @@ POST /calendar/test-connection?user_id=USER_ID
 Tests the connection to Google Calendar API.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -112,6 +120,7 @@ Tests the connection to Google Calendar API.
 ```
 
 #### Revoke Access
+
 ```http
 DELETE /calendar/revoke-access?user_id=USER_ID
 ```
@@ -119,6 +128,7 @@ DELETE /calendar/revoke-access?user_id=USER_ID
 Revokes Google Calendar access for a user.
 
 **Response:**
+
 ```json
 {
   "authenticated": false,
@@ -129,6 +139,7 @@ Revokes Google Calendar access for a user.
 ### Calendar Sync Endpoints
 
 #### Sync Task to Calendar
+
 ```http
 POST /calendar/sync-task?task_id=TASK_ID&user_id=USER_ID
 ```
@@ -136,6 +147,7 @@ POST /calendar/sync-task?task_id=TASK_ID&user_id=USER_ID
 Syncs a task to Google Calendar. The task must have a due date.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -145,6 +157,7 @@ Syncs a task to Google Calendar. The task must have a due date.
 ```
 
 #### Remove Task from Calendar
+
 ```http
 DELETE /calendar/remove-task/TASK_ID?user_id=USER_ID
 ```
@@ -152,6 +165,7 @@ DELETE /calendar/remove-task/TASK_ID?user_id=USER_ID
 Removes a task from Google Calendar.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -160,6 +174,7 @@ Removes a task from Google Calendar.
 ```
 
 #### Get Calendar Events for Task
+
 ```http
 GET /calendar/events/TASK_ID?user_id=USER_ID
 ```
@@ -167,6 +182,7 @@ GET /calendar/events/TASK_ID?user_id=USER_ID
 Gets calendar events associated with a specific task.
 
 **Response:**
+
 ```json
 [
   {
@@ -244,13 +260,16 @@ python -m pytest tests/test_calendar_service.py tests/test_calendar_api.py -v
 ### Common Issues
 
 1. **"Google Calendar credentials not configured"**
+
    - Ensure `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set in your environment
 
 2. **"Authentication failed"**
+
    - Check that the redirect URI in Google Cloud Console matches your `GOOGLE_REDIRECT_URI`
    - Ensure the authorization code hasn't expired
 
 3. **"Permission denied"**
+
    - Verify that the Google Calendar API is enabled in your Google Cloud Project
    - Check that the user has granted calendar access permissions
 

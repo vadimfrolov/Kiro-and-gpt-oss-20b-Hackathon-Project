@@ -126,13 +126,14 @@ class OllamaService:
         
         raise OllamaConnectionError(f"All retry attempts failed. Last error: {last_exception}")
     
-    async def _generate_completion(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+    async def _generate_completion(self, prompt: str, system_prompt: Optional[str] = None, timeout: float = 45.0) -> str:
         """
         Generate completion from Ollama.
         
         Args:
             prompt: User prompt
             system_prompt: Optional system prompt for context
+            timeout: Timeout in seconds for the generation
             
         Returns:
             Generated completion text
@@ -148,13 +149,23 @@ class OllamaService:
                 messages.append({"role": "system", "content": system_prompt})
             messages.append({"role": "user", "content": prompt})
             
-            response = client.chat(
-                model=self.model,
-                messages=messages,
-                stream=False
-            )
-            
-            return response['message']['content']
+            # Run the synchronous ollama call in a thread with timeout
+            loop = asyncio.get_event_loop()
+            try:
+                response = await asyncio.wait_for(
+                    loop.run_in_executor(
+                        None, 
+                        lambda: client.chat(
+                            model=self.model,
+                            messages=messages,
+                            stream=False
+                        )
+                    ),
+                    timeout=timeout
+                )
+                return response['message']['content']
+            except asyncio.TimeoutError:
+                raise OllamaConnectionError(f"AI generation timed out after {timeout} seconds")
         
         return await self._retry_with_backoff(_do_generate)
     

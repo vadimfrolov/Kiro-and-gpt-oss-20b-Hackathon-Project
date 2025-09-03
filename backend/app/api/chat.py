@@ -15,7 +15,7 @@ from app.utils.database import create_chat_message_from_schema
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
-@router.post("/generate-tasks", response_model=ChatResponse)
+@router.post("/generate-tasks")
 async def generate_tasks_from_prompt(
     request: ChatPromptRequest,
     db: Session = Depends(get_db)
@@ -60,7 +60,7 @@ async def generate_tasks_from_prompt(
             assistant_content += f" Context considered: {request.context}"
         
         # Convert generated tasks to dict for JSON storage
-        tasks_data = [task.model_dump() for task in generated_tasks]
+        tasks_data = [task.model_dump(mode='json') for task in generated_tasks]
         
         assistant_message = ChatMessageModel(
             content=assistant_content,
@@ -71,11 +71,18 @@ async def generate_tasks_from_prompt(
         db.commit()
         db.refresh(assistant_message)
         
-        # Return response
-        return ChatResponse(
-            message=ChatMessage.model_validate(assistant_message),
-            generated_tasks=generated_tasks
-        )
+        # Create response data
+        response_data = {
+            "message": ChatMessage.model_validate(assistant_message).model_dump(),
+            "generated_tasks": [task.model_dump() for task in generated_tasks]
+        }
+        
+        # Return wrapped response
+        return {
+            "success": True,
+            "data": response_data,
+            "message": f"Generated {len(generated_tasks)} tasks successfully"
+        }
         
     except OllamaConnectionError as e:
         raise HTTPException(status_code=503, detail=str(e))
@@ -84,33 +91,56 @@ async def generate_tasks_from_prompt(
         raise HTTPException(status_code=500, detail=f"Failed to generate tasks: {str(e)}")
 
 
-@router.get("/messages", response_model=List[ChatMessage])
+@router.get("/messages")
 async def get_chat_messages(
-    limit: int = 50,
-    offset: int = 0,
+    page: int = 1,
+    size: int = 50,
     db: Session = Depends(get_db)
 ):
     """
-    Get chat message history.
+    Get chat message history with pagination.
     
     Args:
-        limit: Maximum number of messages to return
-        offset: Number of messages to skip
+        page: Page number (1-based)
+        size: Number of messages per page
         db: Database session
         
     Returns:
-        List of chat messages
+        Paginated response with chat messages
     """
     try:
+        # Calculate offset from page number
+        offset = (page - 1) * size
+        
+        # Get total count
+        total = db.query(ChatMessageModel).count()
+        
+        # Get messages for the current page
         messages = (
             db.query(ChatMessageModel)
             .order_by(ChatMessageModel.timestamp.desc())
             .offset(offset)
-            .limit(limit)
+            .limit(size)
             .all()
         )
         
-        return [ChatMessage.model_validate(msg) for msg in messages]
+        # Calculate total pages
+        pages = (total + size - 1) // size if total > 0 else 1
+        
+        # Return paginated response wrapped in ApiResponse format
+        paginated_data = {
+            "items": [ChatMessage.model_validate(msg) for msg in messages],
+            "total": total,
+            "page": page,
+            "size": size,
+            "pages": pages
+        }
+        
+        return {
+            "success": True,
+            "data": paginated_data,
+            "message": f"Retrieved {len(messages)} messages"
+        }
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve messages: {str(e)}")

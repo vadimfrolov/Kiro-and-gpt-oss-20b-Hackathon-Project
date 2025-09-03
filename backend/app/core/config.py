@@ -29,7 +29,14 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     LOG_LEVEL: str = "INFO"
     SECRET_KEY: str = "your-secret-key-here"
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",  # Vite default port
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",  # Vite preview port
+        "http://127.0.0.1:4173"
+    ]
     
     model_config = {"env_file": ".env"}
 
