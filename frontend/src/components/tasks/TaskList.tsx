@@ -3,7 +3,8 @@ import { Task, TaskFilters as TaskFiltersType, TaskUpdate, Priority, TaskStatus 
 import { TaskItem } from './TaskItem';
 import { TaskFilters } from './TaskFilters';
 import { TaskForm } from './TaskForm';
-import { Plus, Filter, SortAsc, SortDesc, Grid, List } from 'lucide-react';
+import { Plus, Filter, SortAsc, SortDesc, Grid, List, Download } from 'lucide-react';
+import { ICSDownloadButton } from '../calendar';
 
 interface TaskListProps {
   tasks: Task[];
@@ -156,6 +157,12 @@ export const TaskList: React.FC<TaskListProps> = ({
         </div>
         
         <div className="flex items-center space-x-2">
+          <ICSDownloadButton 
+            tasks={filteredAndSortedTasks}
+            variant="button"
+            className="text-sm"
+          />
+          
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`px-3 py-2 text-sm font-medium rounded-md border transition-colors ${

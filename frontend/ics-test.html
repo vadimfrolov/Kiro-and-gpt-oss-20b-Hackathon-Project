@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICS Test - Apple Calendar Compatible</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .task { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background: #f8f9fa; }
+        .button { background: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .button:hover { background: #0056b3; }
+        .code { background: #f1f1f1; padding: 10px; border-radius: 4px; font-family: monospace; white-space: pre-wrap; font-size: 12px; }
+        .success { color: green; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🍎 Apple Calendar Compatible ICS Test</h1>
+    
+    <div class="task">
+        <h3>Test Task with Due Date</h3>
+        <p><strong>Title:</strong> Complete project documentation</p>
+        <p><strong>Due Date:</strong> <span id="dueDate"></span></p>
+        <p><strong>Priority:</strong> HIGH</p>
+        <button class="button" onclick="downloadTaskWithDate()">📥 Download (.ics)</button>
+        <button class="button" onclick="showICSContent()">👁️ Show ICS Content</button>
+    </div>
+
+    <div class="task">
+        <h3>Test Task without Due Date</h3>
+        <p><strong>Title:</strong> Buy groceries</p>
+        <p><strong>Due Date:</strong> <span class="warning">None (will use current time)</span></p>
+        <p><strong>Priority:</strong> MEDIUM</p>
+        <button class="button" onclick="downloadTaskWithoutDate()">📥 Download (.ics)</button>
+    </div>
+
+    <div id="icsPreview" style="display: none;">
+        <h3>📄 Generated ICS Content:</h3>
+        <div class="code" id="icsContent"></div>
+        <p class="success">✅ This is what gets saved to the .ics file</p>
+    </div>
+
+    <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-radius: 8px;">
+        <h3>🔧 Troubleshooting Tips:</h3>
+        <ol>
+            <li><strong>Make sure the task has a due date</strong> - Apple Calendar needs valid dates</li>
+            <li><strong>Check the file extension</strong> - Must be .ics</li>
+            <li><strong>Try opening with different apps</strong>:
+                <ul>
+                    <li>Double-click the .ics file (should open Calendar)</li>
+                    <li>Drag and drop into Calendar app</li>
+                    <li>File → Import in Calendar app</li>
+                </ul>
+            </li>
+            <li><strong>Check Calendar preferences</strong> - Make sure imports are enabled</li>
+            <li><strong>Try a different calendar</strong> - Test with Google Calendar web interface</li>
+        </ol>
+        
+        <h4>📋 What's Fixed in This Version:</h4>
+        <ul>
+            <li>✅ Proper UTC date formatting (YYYYMMDDTHHMMSSZ)</li>
+            <li>✅ Correct line endings (CRLF)</li>
+            <li>✅ Valid UID format with domain</li>
+            <li>✅ Proper text escaping for special characters</li>
+            <li>✅ All tasks get valid dates (uses current time if no due date)</li>
+            <li>✅ Simplified structure for better compatibility</li>
+        </ul>
+    </div>
+
+    <script>
+        // Set due date to tomorrow at 2 PM for testing
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(14, 0, 0, 0);
+        document.getElementById('dueDate').textContent = tomorrow.toLocaleString();
+
+        // Sample tasks
+        const taskWithDate = {
+            id: 1,
+            title: 'Complete project documentation',
+            description: 'Write comprehensive documentation for the Ollama Todo App project',
+            due_date: tomorrow.toISOString(),
+            priority: 'HIGH',
+            category: 'Work',
+            status: 'IN_PROGRESS',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            ai_generated: false
+        };
+
+        const taskWithoutDate = {
+            id: 2,
+            title: 'Buy groceries',
+            description: 'Milk, bread, eggs, and vegetables for the week',
+            due_date: null,
+            priority: 'MEDIUM',
+            category: 'Personal',
+            status: 'PENDING',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            ai_generated: true
+        };
+
+        // Fixed ICS generator (Apple Calendar compatible)
+        function generateICSContent(task) {
+            const now = new Date();
+            
+            // If no due date, create an event for "now"
+            const dueDate = task.due_date ? new Date(task.due_date) : now;
+            
+            // Format dates for ICS (Apple Calendar is strict about this)
+            const formatICSDate = (date) => {
+                const year = date.getUTCFullYear();
+                const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(date.getUTCDate()).padStart(2, '0');
+                const hours = String(date.getUTCHours()).padStart(2, '0');
+                const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+                return `${year}${month}${day}T${hours}${minutes}${seconds}Z`;
+            };
+
+            // Generate unique ID
+            const uid = `task-${task.id}-${Date.now()}@ollama-todo-app.com`;
+            
+            // Calculate event duration (1 hour)
+            const startDate = dueDate;
+            const endDate = new Date(startDate.getTime() + (60 * 60 * 1000));
+
+            // Escape special characters
+            const escapeICSText = (text) => {
+                if (!text) return '';
+                return text
+                    .replace(/\\/g, '\\\\')
+                    .replace(/;/g, '\\;')
+                    .replace(/,/g, '\\,')
+                    .replace(/\n/g, '\\n')
+                    .replace(/\r/g, '\\r');
+            };
+
+            // Build ICS content
+            const lines = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Ollama Todo App//Task Export//EN',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH',
+                'BEGIN:VEVENT',
+                `UID:${uid}`,
+                `DTSTAMP:${formatICSDate(now)}`,
+                `DTSTART:${formatICSDate(startDate)}`,
+                `DTEND:${formatICSDate(endDate)}`,
+                `SUMMARY:${escapeICSText(task.title)}`,
+            ];
+
+            // Add optional fields
+            if (task.description) {
+                lines.push(`DESCRIPTION:${escapeICSText(task.description)}`);
+            }
+            
+            if (task.category) {
+                lines.push(`CATEGORIES:${escapeICSText(task.category)}`);
+            }
+
+            // Add priority
+            const priority = (() => {
+                switch (task.priority?.toUpperCase()) {
+                    case 'URGENT': return 1;
+                    case 'HIGH': return 3;
+                    case 'MEDIUM': return 5;
+                    case 'LOW': return 7;
+                    default: return 5;
+                }
+            })();
+            lines.push(`PRIORITY:${priority}`);
+
+            // Add status
+            const status = task.status === 'COMPLETED' ? 'COMPLETED' : 'NEEDS-ACTION';
+            lines.push(`STATUS:${status}`);
+
+            // Add completion date if completed
+            if (task.status === 'COMPLETED') {
+                lines.push(`COMPLETED:${formatICSDate(new Date(task.updated_at))}`);
+            }
+
+            // Add standard fields
+            lines.push('CLASS:PUBLIC');
+            lines.push('TRANSP:OPAQUE');
+
+            // Add reminder only if we have a real due date
+            if (task.due_date) {
+                lines.push('BEGIN:VALARM');
+                lines.push('ACTION:DISPLAY');
+                lines.push(`DESCRIPTION:Reminder: ${escapeICSText(task.title)}`);
+                lines.push('TRIGGER:-PT15M');
+                lines.push('END:VALARM');
+            }
+
+            lines.push('END:VEVENT');
+            lines.push('END:VCALENDAR');
+
+            // Join with proper line endings (CRLF is required by RFC 5545)
+            return lines.join('\r\n');
+        }
+
+        function downloadTaskAsICS(task) {
+            const icsContent = generateICSContent(task);
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.href = url;
+            link.download = `task-${task.id}-${task.title.replace(/[^a-zA-Z0-9]/g, '-')}.ics`;
+            
+            document.body.appendChild(link);
+            link.click();
+            
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadTaskWithDate() {
+            downloadTaskAsICS(taskWithDate);
+            alert('📥 Task with due date downloaded! This should work with Apple Calendar.');
+        }
+
+        function downloadTaskWithoutDate() {
+            downloadTaskAsICS(taskWithoutDate);
+            alert('📥 Task without due date downloaded! Uses current time as event time.');
+        }
+
+        function showICSContent() {
+            const icsContent = generateICSContent(taskWithDate);
+            document.getElementById('icsContent').textContent = icsContent;
+            document.getElementById('icsPreview').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -5,13 +5,13 @@ import {
   Edit2, 
   Trash2, 
   Check, 
-  X, 
   Calendar, 
   Tag, 
   AlertCircle,
   Clock,
   CheckCircle2
 } from 'lucide-react';
+import { CalendarSyncStatus, ICSDownloadButton } from '../calendar';
 
 interface TaskItemProps {
   task: Task;
@@ -177,6 +177,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               </div>
             )}
             
+            <CalendarSyncStatus task={task} showControls={true} />
+            
             <div className="text-xs">
               Created {format(new Date(task.created_at), 'MMM d, yyyy')}
             </div>
@@ -186,6 +188,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         {/* Action Buttons */}
         {!isEditing && (
           <div className="flex items-center space-x-2 ml-4">
+            <ICSDownloadButton 
+              task={task} 
+              variant="icon"
+              title="Download as calendar file (.ics)"
+            />
             <button
               onClick={() => setIsEditing(true)}
               className="p-1 text-gray-400 hover:text-blue-600 transition-colors"

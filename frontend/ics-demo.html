@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICS Download Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .task { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .button { background: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+        .button:hover { background: #0056b3; }
+        .demo-task { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <h1>📅 ICS Calendar Export Demo</h1>
+    <p>This demonstrates the .ics file generation feature for the Ollama Todo App.</p>
+    
+    <div class="task demo-task">
+        <h3>📋 Sample Task: Complete project documentation</h3>
+        <p><strong>Description:</strong> Write comprehensive documentation for the Ollama Todo App project</p>
+        <p><strong>Due Date:</strong> December 15, 2024 at 10:00 AM</p>
+        <p><strong>Priority:</strong> HIGH</p>
+        <p><strong>Category:</strong> Work</p>
+        <button class="button" onclick="downloadSampleTask()">📥 Download as .ics file</button>
+    </div>
+
+    <div class="task demo-task">
+        <h3>🛒 Sample Task: Buy groceries</h3>
+        <p><strong>Description:</strong> Milk, bread, eggs, and vegetables for the week</p>
+        <p><strong>Due Date:</strong> December 10, 2024 at 6:00 PM</p>
+        <p><strong>Priority:</strong> MEDIUM</p>
+        <p><strong>Category:</strong> Personal</p>
+        <button class="button" onclick="downloadGroceryTask()">📥 Download as .ics file</button>
+    </div>
+
+    <div class="task">
+        <h3>📦 Bulk Export</h3>
+        <p>Download all sample tasks as a single calendar file:</p>
+        <button class="button" onclick="downloadAllTasks()">📥 Download All Tasks (.ics)</button>
+    </div>
+
+    <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-radius: 8px;">
+        <h3>🎯 How it works:</h3>
+        <ol>
+            <li><strong>Click any download button</strong> to generate an .ics file</li>
+            <li><strong>The file will download automatically</strong> to your Downloads folder</li>
+            <li><strong>Open the .ics file</strong> with any calendar app (Google Calendar, Outlook, Apple Calendar, etc.)</li>
+            <li><strong>The task will be imported</strong> as a calendar event with all details preserved</li>
+        </ol>
+        
+        <h4>📋 ICS File Features:</h4>
+        <ul>
+            <li>✅ Task title becomes event summary</li>
+            <li>✅ Task description becomes event description</li>
+            <li>✅ Due date becomes event start time</li>
+            <li>✅ Priority is mapped to calendar priority levels</li>
+            <li>✅ Category is preserved as event category</li>
+            <li>✅ 15-minute reminder is automatically added</li>
+            <li>✅ Completed tasks are marked as completed events</li>
+        </ul>
+    </div>
+
+    <script>
+        // Sample task data
+        const sampleTask1 = {
+            id: 1,
+            title: 'Complete project documentation',
+            description: 'Write comprehensive documentation for the Ollama Todo App project',
+            due_date: '2024-12-15T10:00:00.000Z',
+            priority: 'HIGH',
+            category: 'Work',
+            status: 'IN_PROGRESS',
+            created_at: '2024-12-01T09:00:00.000Z',
+            updated_at: '2024-12-01T09:00:00.000Z',
+            ai_generated: false
+        };
+
+        const sampleTask2 = {
+            id: 2,
+            title: 'Buy groceries',
+            description: 'Milk, bread, eggs, and vegetables for the week',
+            due_date: '2024-12-10T18:00:00.000Z',
+            priority: 'MEDIUM',
+            category: 'Personal',
+            status: 'PENDING',
+            created_at: '2024-12-01T08:30:00.000Z',
+            updated_at: '2024-12-01T08:30:00.000Z',
+            ai_generated: true
+        };
+
+        // ICS generation functions (simplified version)
+        function generateICSContent(task) {
+            const now = new Date();
+            const dueDate = task.due_date ? new Date(task.due_date) : null;
+            
+            const formatICSDate = (date) => {
+                return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+            };
+
+            const escapeICSText = (text) => {
+                return text
+                    .replace(/\\/g, '\\\\')
+                    .replace(/;/g, '\\;')
+                    .replace(/,/g, '\\,')
+                    .replace(/\n/g, '\\n')
+                    .replace(/\r/g, '');
+            };
+
+            const getICSPriority = (priority) => {
+                switch (priority.toUpperCase()) {
+                    case 'URGENT': return 1;
+                    case 'HIGH': return 3;
+                    case 'MEDIUM': return 5;
+                    case 'LOW': return 7;
+                    default: return 5;
+                }
+            };
+
+            const uid = `task-${task.id}-${Date.now()}@ollama-todo-app.local`;
+            const startDate = dueDate || now;
+            const endDate = new Date(startDate.getTime() + (60 * 60 * 1000));
+
+            const icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Ollama Todo App//Task Export//EN',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH',
+                'BEGIN:VEVENT',
+                `UID:${uid}`,
+                `DTSTAMP:${formatICSDate(now)}`,
+                `DTSTART:${formatICSDate(startDate)}`,
+                `DTEND:${formatICSDate(endDate)}`,
+                `SUMMARY:${escapeICSText(task.title)}`,
+                task.description ? `DESCRIPTION:${escapeICSText(task.description)}` : '',
+                task.category ? `CATEGORIES:${escapeICSText(task.category)}` : '',
+                `PRIORITY:${getICSPriority(task.priority)}`,
+                `STATUS:${task.status === 'COMPLETED' ? 'COMPLETED' : 'NEEDS-ACTION'}`,
+                'CLASS:PUBLIC',
+                'TRANSP:OPAQUE',
+                dueDate ? 'BEGIN:VALARM' : '',
+                dueDate ? 'ACTION:DISPLAY' : '',
+                dueDate ? `DESCRIPTION:Reminder: ${escapeICSText(task.title)}` : '',
+                dueDate ? 'TRIGGER:-PT15M' : '',
+                dueDate ? 'END:VALARM' : '',
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].filter(line => line !== '').join('\r\n');
+
+            return icsContent;
+        }
+
+        function downloadTaskAsICS(task) {
+            const icsContent = generateICSContent(task);
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.href = url;
+            link.download = `task-${task.id}-${task.title.replace(/[^a-zA-Z0-9]/g, '-')}.ics`;
+            
+            document.body.appendChild(link);
+            link.click();
+            
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function generateMultipleTasksICS(tasks) {
+            const now = new Date();
+            
+            const formatICSDate = (date) => {
+                return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+            };
+
+            const escapeICSText = (text) => {
+                return text
+                    .replace(/\\/g, '\\\\')
+                    .replace(/;/g, '\\;')
+                    .replace(/,/g, '\\,')
+                    .replace(/\n/g, '\\n')
+                    .replace(/\r/g, '');
+            };
+
+            const getICSPriority = (priority) => {
+                switch (priority.toUpperCase()) {
+                    case 'URGENT': return 1;
+                    case 'HIGH': return 3;
+                    case 'MEDIUM': return 5;
+                    case 'LOW': return 7;
+                    default: return 5;
+                }
+            };
+
+            let icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Ollama Todo App//Tasks Export//EN',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH'
+            ];
+
+            tasks.forEach(task => {
+                const dueDate = task.due_date ? new Date(task.due_date) : null;
+                const uid = `task-${task.id}-${Date.now()}@ollama-todo-app.local`;
+                const startDate = dueDate || now;
+                const endDate = new Date(startDate.getTime() + (60 * 60 * 1000));
+
+                const eventLines = [
+                    'BEGIN:VEVENT',
+                    `UID:${uid}`,
+                    `DTSTAMP:${formatICSDate(now)}`,
+                    `DTSTART:${formatICSDate(startDate)}`,
+                    `DTEND:${formatICSDate(endDate)}`,
+                    `SUMMARY:${escapeICSText(task.title)}`,
+                    task.description ? `DESCRIPTION:${escapeICSText(task.description)}` : '',
+                    task.category ? `CATEGORIES:${escapeICSText(task.category)}` : '',
+                    `PRIORITY:${getICSPriority(task.priority)}`,
+                    `STATUS:${task.status === 'COMPLETED' ? 'COMPLETED' : 'NEEDS-ACTION'}`,
+                    'CLASS:PUBLIC',
+                    'TRANSP:OPAQUE',
+                    dueDate ? 'BEGIN:VALARM' : '',
+                    dueDate ? 'ACTION:DISPLAY' : '',
+                    dueDate ? `DESCRIPTION:Reminder: ${escapeICSText(task.title)}` : '',
+                    dueDate ? 'TRIGGER:-PT15M' : '',
+                    dueDate ? 'END:VALARM' : '',
+                    'END:VEVENT'
+                ].filter(line => line !== '');
+
+                icsContent = icsContent.concat(eventLines);
+            });
+
+            icsContent.push('END:VCALENDAR');
+            
+            return icsContent.join('\r\n');
+        }
+
+        function downloadMultipleTasksAsICS(tasks, filename) {
+            const icsContent = generateMultipleTasksICS(tasks);
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.href = url;
+            link.download = filename || `ollama-todo-tasks-${new Date().toISOString().split('T')[0]}.ics`;
+            
+            document.body.appendChild(link);
+            link.click();
+            
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Demo functions
+        function downloadSampleTask() {
+            downloadTaskAsICS(sampleTask1);
+            alert('📥 Task downloaded as .ics file! Check your Downloads folder.');
+        }
+
+        function downloadGroceryTask() {
+            downloadTaskAsICS(sampleTask2);
+            alert('📥 Task downloaded as .ics file! Check your Downloads folder.');
+        }
+
+        function downloadAllTasks() {
+            downloadMultipleTasksAsICS([sampleTask1, sampleTask2], 'ollama-todo-sample-tasks.ics');
+            alert('📥 All tasks downloaded as .ics file! Check your Downloads folder.');
+        }
+    </script>
+</body>
+</html>

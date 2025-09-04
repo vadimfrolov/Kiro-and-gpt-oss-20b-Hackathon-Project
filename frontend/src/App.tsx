@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
-import { TaskList, ChatContainer } from './components'
+import { TaskList, ChatContainer, CalendarIntegration } from './components'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { NotificationSystem } from './components/NotificationSystem'
 import { 
@@ -14,7 +14,7 @@ import {
   GeneratedTask,
   MessageRole
 } from './types'
-import { MessageSquare, CheckSquare } from 'lucide-react'
+import { MessageSquare, CheckSquare, Calendar } from 'lucide-react'
 import { useRealTimeSync } from './hooks/useRealTimeSync'
 import { useOnlineStatus } from './stores/useOfflineStore'
 import { useChatConversation, useChatMessages } from './hooks/useChat'
@@ -107,16 +107,17 @@ function App() {
   const [currentView, setCurrentView] = useState<ViewMode>('chat');
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [freshResponse, setFreshResponse] = useState<{ message: ChatMessage; tasks: GeneratedTask[] } | null>(null);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
   
   // Initialize real-time sync and online status
   const { isOnline } = useOnlineStatus();
-  const { syncNow } = useRealTimeSync({
+  useRealTimeSync({
     enabled: true,
     interval: 30000, // 30 seconds
   });
   
   // Chat functionality
-  const { sendPrompt, isGenerating, error: chatError, refreshMessages } = useChatConversation();
+  const { sendPrompt, isGenerating, error: chatError } = useChatConversation();
   const { data: chatMessagesData, isLoading: chatLoading } = useChatMessages();
   const notify = useNotify();
   
@@ -148,6 +149,7 @@ function App() {
     const newTask: Task = {
       id: Date.now(),
       ...taskData,
+      ai_generated: taskData.ai_generated || false,
       status: TaskStatus.PENDING,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -276,30 +278,41 @@ function App() {
                   </div>
                 </div>
                 
-                {/* View Toggle */}
-                <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                <div className="flex items-center space-x-3">
+                  {/* Calendar Integration Button */}
                   <button
-                    onClick={() => setCurrentView('tasks')}
-                    className={`px-4 py-2 text-sm font-medium flex items-center space-x-2 transition-colors ${
-                      currentView === 'tasks'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
+                    onClick={() => setShowCalendarModal(true)}
+                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2"
                   >
-                    <CheckSquare size={16} />
-                    <span>Tasks</span>
+                    <Calendar size={16} />
+                    <span>Calendar</span>
                   </button>
-                  <button
-                    onClick={() => setCurrentView('chat')}
-                    className={`px-4 py-2 text-sm font-medium flex items-center space-x-2 transition-colors border-l border-gray-300 ${
-                      currentView === 'chat'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    <MessageSquare size={16} />
-                    <span>AI Chat</span>
-                  </button>
+
+                  {/* View Toggle */}
+                  <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => setCurrentView('tasks')}
+                      className={`px-4 py-2 text-sm font-medium flex items-center space-x-2 transition-colors ${
+                        currentView === 'tasks'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <CheckSquare size={16} />
+                      <span>Tasks</span>
+                    </button>
+                    <button
+                      onClick={() => setCurrentView('chat')}
+                      className={`px-4 py-2 text-sm font-medium flex items-center space-x-2 transition-colors border-l border-gray-300 ${
+                        currentView === 'chat'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <MessageSquare size={16} />
+                      <span>AI Chat</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -332,6 +345,12 @@ function App() {
         
         {/* Global Notification System */}
         <NotificationSystem />
+        
+        {/* Calendar Integration Modal */}
+        <CalendarIntegration 
+          isOpen={showCalendarModal}
+          onClose={() => setShowCalendarModal(false)}
+        />
       </Router>
     </ErrorBoundary>
   )
