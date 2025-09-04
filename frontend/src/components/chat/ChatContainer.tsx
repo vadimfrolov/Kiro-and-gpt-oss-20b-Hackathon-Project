@@ -324,7 +324,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
 
 
       {/* Debug Task Preview Status */}
-      <div className="bg-blue-100 p-2 text-xs text-blue-800 flex justify-between items-center">
+      {/* <div className="bg-blue-100 p-2 text-xs text-blue-800 flex justify-between items-center">
         <span>
           🔍 TaskPreview Debug: showTaskPreview={showTaskPreview ? 'YES' : 'NO'} | 
           hasMessage={hasMessage ? 'YES' : 'NO'} |
@@ -343,7 +343,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
         >
           🔄 Refresh
         </button>
-      </div>
+      </div> */}
 
       {/* Task Preview */}
       {showTaskPreview && tasksToShow && (
