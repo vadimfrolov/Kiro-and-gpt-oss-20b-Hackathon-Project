@@ -6,7 +6,7 @@ Project for 2 hackathons:
 
 [OpenAI Open Model Hackathon](https://openai.devpost.com/?_gl=1*qiue8*_ga*NTQ2ODMwNjc1LjE3NTcyNjMyMzM.)
 
-[Code with Kiro Hackathon](https://www.codewithkiro.com/hackathon)
+[Code with Kiro Hackathon](https://kiro.devpost.com/)
 
 <img width="891" height="894" alt="task view" src="https://github.com/user-attachments/assets/a2913f9c-9360-4dfd-994a-6cb5dae0db34" />
 <img width="891" height="982" alt="chat view" src="https://github.com/user-attachments/assets/4d1ebf28-d93a-475c-a876-339e99b5d77b" />
