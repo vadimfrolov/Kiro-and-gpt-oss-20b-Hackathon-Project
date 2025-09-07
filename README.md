@@ -8,6 +8,10 @@ Project for 2 hackathons:
 
 [Code with Kiro Hackathon](https://www.codewithkiro.com/hackathon)
 
+<img width="891" height="894" alt="task view" src="https://github.com/user-attachments/assets/a2913f9c-9360-4dfd-994a-6cb5dae0db34" />
+<img width="891" height="982" alt="chat view" src="https://github.com/user-attachments/assets/4d1ebf28-d93a-475c-a876-339e99b5d77b" />
+
+
 ## Features
 
 - 🚀 Modern React 19 frontend with TypeScript and Vite
