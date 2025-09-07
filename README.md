@@ -2,6 +2,10 @@
 
 A local-first AI-powered todo list application that combines React 19, FastAPI, PostgreSQL, and Ollama for intelligent task management.
 
+[OpenAI Open Model Hackathon](https://openai.devpost.com/?_gl=1*qiue8*_ga*NTQ2ODMwNjc1LjE3NTcyNjMyMzM.)
+
+[Code with Kiro Hackathon](https://www.codewithkiro.com/hackathon)
+
 ## Features
 
 - 🚀 Modern React 19 frontend with TypeScript and Vite
