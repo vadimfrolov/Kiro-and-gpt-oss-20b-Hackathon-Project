@@ -1,6 +1,26 @@
-# Ollama Todo App
+# Smart Planner
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Hackathon](https://img.shields.io/badge/Hackathon-OpenAI%20Open%20Model-blue.svg)](https://openai.devpost.com/)
+[![Hackathon](https://img.shields.io/badge/Hackathon-Code%20with%20Kiro-purple.svg)](https://kiro.devpost.com/)
 
 A local-first AI-powered todo list application that combines React 19, FastAPI, PostgreSQL, and Ollama for intelligent task management.
+
+## 🤖 AI-Powered Development
+
+This project was developed with significant assistance from **Kiro IDE**, an AI-powered development environment that helped:
+
+- 📋 **Requirements Analysis** - Generated comprehensive project requirements and user stories
+- 🏗️ **Architecture Design** - Created detailed system architecture and component design documents  
+- ✅ **Task Planning** - Broke down development into structured, manageable tasks
+- 💻 **Feature Development** - Implemented most of the core application features including:
+  - React 19 frontend with TypeScript and modern hooks
+  - FastAPI backend with proper async patterns
+  - Database models and API endpoints
+  - AI integration with Ollama for task generation
+  - Real-time chat interface and task management
+
+Kiro IDE's AI capabilities accelerated development while maintaining code quality and architectural best practices.
 
 Project for 2 hackathons:
 
